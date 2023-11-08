@@ -1,77 +1,64 @@
 //your code here
+const main = document.querySelector("main");
+const verify = document.getElementById("verify");
+const reset = document.getElementById("reset");
+const para = document.getElementById("para");
 
-//your code here
-const images = document.querySelectorAll('img');
-const resetButton = document.getElementById('reset');
-const verifyButton = document.getElementById('verify');
-const para = document.getElementById('para');
-const h = document.getElementById('h');
+// console.log(main);
+let arrClasses = ["img1" ,"img2","img3","img4","img5" ]
+let randomPhotoClass = arrClasses[Math.round(Math.random()*5)];
+// console.log(randomPhotoUrl);
+const randomPhoto = document.createElement("img");
+randomPhoto.className = randomPhotoClass;
+main.appendChild(randomPhoto);
 
-let selectedImages = [];
-let identicalImage = 0;
 
-// Randomly shuffling images
-function shuffleImages() {
-  const imageSources = [
-    'https://picsum.photos/id/237/200/300',
-    'https://picsum.photos/seed/picsum/200/300',
-    'https://picsum.photos/200/300?grayscale',
-    'https://picsum.photos/200/300/',
-    'https://picsum.photos/200/300.jpg',
-  ];
-
-  imageSources.sort(() => Math.random() - 0.5);
-  images.forEach((img, index) => {
-    img.src = imageSources[index];
-    img.addEventListener('click', () => handleClick(index + 1));
-  });
+const imgs = document.getElementsByTagName("img");
+let clicked = 0;
+let selected = [];
+for (let i=0 ;i<imgs.length;i++){
+    const currentImg = imgs[i];
+    currentImg.addEventListener("click",()=>{
+        selected.push(currentImg);
+        clicked++;
+        currentImg.classList.add("selected");  
+        if(clicked === 1){
+              reset.style.display = "flex";
+            reset.addEventListener("click",()=>{
+                clicked = 0;
+                for(let val of selected) val.classList.remove("selected");
+                reset.style.display = "none"; 
+                para.style.display = "none";
+            })
+        }
+        else if(clicked === 2){
+            verify.style.display = "flex";
+        }
+        else{
+            verify.style.display = "none";
+        }
+    })
 }
 
-// Resetting the state to default
-function resetState() {
-  selectedImages = [];
-  identicalImage = 0;
-  para.textContent = '';
-  verifyButton.style.display = 'none';
-  resetButton.style.display = 'none';
-  images.forEach((img) => img.classList.remove('selected'));
-}
-
-// Handling click on the images
-function handleClick(imageIndex) {
-  if (selectedImages.length < 2) {
-    if (!selectedImages.includes(imageIndex)) {
-      selectedImages.push(imageIndex);
-      images[imageIndex - 1].classList.add('selected');
+verify.addEventListener("click",()=>{
+    let classes = [];
+    for(let val of selected){
+        classes.push(val.className);
     }
-  }
-
-  if (selectedImages.length === 2) {
-    verifyButton.style.display = 'block';
-  }
-
-  if (selectedImages.length === 1) {
-    resetButton.style.display = 'block';
-  }
-}
-
-// Verifying the user's selection
-function verifySelection() {
-  if (selectedImages.length === 2) {
-    if (selectedImages[0] === selectedImages[1]) {
-      para.textContent = 'You are a human. Congratulations!';
-    } else {
-      para.textContent = 'We can\'t verify you as a human. You selected the non-identical tiles.';
+    let sameClass = true;
+    for(let i = 0; i < classes.length-1; i++){
+         if(classes[i] !== classes[i+1]){
+            sameClass = false;
+            break;
+         }
     }
-  }
-  verifyButton.style.display = 'none';
-}
-
-// Event listeners for reset and verify buttons
-resetButton.addEventListener('click', resetState);
-verifyButton.addEventListener('click', verifySelection);
-
-// Initialize the app
-shuffleImages();
-
-
+    if(sameClass === true){
+        para.style.display = "flex";
+       para.innerText = "You are a human. Congratulations!";
+    }
+    else{
+        para.style.display = "flex";
+        para.innerText = "We can't verify you as a human. You selected the non-identical tiles.";
+    }
+    verify.style.display = "none";
+})
